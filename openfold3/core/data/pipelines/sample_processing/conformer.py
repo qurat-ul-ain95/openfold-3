@@ -212,6 +212,13 @@ def get_processed_reference_conformer(
             # worked)
             mol = add_conformer_atom_mask(mol)
 
+    # Update in_crop_mask to match the current number of atoms in the molecule
+    # (in case hydrogens were removed during conformer generation or molecule was modified)
+    current_conf_atom_names = np.array(
+        uniquify_ids([atom.GetProp("annot_atom_name") for atom in mol.GetAtoms()])
+    )
+    in_crop_mask = np.isin(current_conf_atom_names, in_crop_atom_names)
+
     return ProcessedReferenceMolecule(
         mol=mol,
         component_id=component_id,
